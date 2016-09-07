@@ -12,7 +12,8 @@ namespace YelpSharper.Tests
         public YelpSharperClientTest()
         {
             _yelpSharperClient = new YelpSharperClient();
-            _yelpSharperClient.GetToken("Your client id here", "Your client secret here");
+            var token = _yelpSharperClient.GetToken("Your client id here", "Your client secret here");
+            _yelpSharperClient.AccessToken = token.AccessToken;
         }
 
         [TestMethod]

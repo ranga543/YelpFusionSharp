@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 using YelpSharper.Models;
 
 namespace YelpSharper
@@ -29,21 +32,55 @@ namespace YelpSharper
         #endregion
 
         #region Instance Yelp Api Methods
-        public TokenResponse GetToken(string clientId, string clientSecret)
+        public Task<TokenResponse> GetAsyncToken(string clientId, string clientSecret)
         {
-            using (var client = GetHttpClient())
+            var client = GetHttpClient();
+            var tcs = new TaskCompletionSource<TokenResponse>();
+
+            var responseTask = client.PostAsync(AuthPath, new FormUrlEncodedContent(new[]
             {
-                var response = client.PostAsync(AuthPath, new FormUrlEncodedContent(new[]
-                {
                     new KeyValuePair<string, string>("grant_type", "client_credentials"),
                     new KeyValuePair<string, string>("client_id", clientId),
                     new KeyValuePair<string, string>("client_secret", clientSecret)
-                })).Result;
+                }));
+            ResponseHandle(responseTask, tcs);
+            DisposeHttpClient(tcs, client);
+            return tcs.Task;
+        }
 
-                var tokenResponse = response.Content.ReadAsAsync<TokenResponse>().Result;
-                AccessToken = tokenResponse.AccessToken;
-                return tokenResponse;
-            }
+        public TokenResponse GetToken(string clientId, string clientSecret)
+        {
+            return GetAsyncToken(clientId, clientSecret).Result;
+        }
+
+        public Task<SearchResponse> SearchAsync(object queryParams)
+        {
+            return GetAsync<SearchResponse>("/businesses/search", queryParams);
+        }
+
+        public Task<SearchResponse> SearchByPhoneAsync(object queryParams)
+        {
+            return GetAsync<SearchResponse>("/businesses/search/phone", queryParams);
+        }
+
+        public Task<SearchResponse> SearchByTransactionAsync(string transactionType, object queryParams)
+        {
+            return GetAsync<SearchResponse>($"/transactions/{transactionType}/search", queryParams);
+        }
+
+        public Task<Business> GetBusinessAsync(string id)
+        {
+            return GetAsync<Business>($"/businesses/{id}");
+        }
+
+        public Task<ReviewResponse> GetBusinessReviewsAsync(string id)
+        {
+            return GetAsync<ReviewResponse>($"/businesses/{id}/reviews");
+        }
+
+        public Task<AutoCompleteResponse> AutocompleteAsync(object queryParams)
+        {
+            return GetAsync<AutoCompleteResponse>("/autocomplete", queryParams);
         }
 
         public SearchResponse Search(object queryParams)
@@ -78,18 +115,25 @@ namespace YelpSharper
         #endregion
 
         #region Instance Methods
-        public T Get<T>(string endPoint, object queryParams = null)
+        public Task<T> GetAsync<T>(string endPoint, object queryParams = null)
         {
             if(string.IsNullOrEmpty(AccessToken))
                 throw new Exception("AccessToken should not be null or empty");
 
             endPoint = string.Concat(ApiVersion, AppendQueryParameters(endPoint, queryParams));
-            using (var client = GetHttpClient())
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-                var response = client.GetAsync(endPoint).Result;
-                return response.Content.ReadAsAsync<T>().Result;
-            }
+            var client = GetHttpClient();
+
+            var tcs = new TaskCompletionSource<T>();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+            var responseTask = client.GetAsync(endPoint);
+            ResponseHandle(responseTask, tcs);
+            DisposeHttpClient(tcs, client);
+            return tcs.Task;
+        }
+
+        public T Get<T>(string endPoint, object queryParams = null)
+        {
+            return GetAsync<T>(endPoint, queryParams).Result;
         }
         #endregion
 
@@ -146,6 +190,39 @@ namespace YelpSharper
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             return client;
+        }
+
+        private static void ResponseHandle<T>(Task<HttpResponseMessage> responseTask, TaskCompletionSource<T> tcs)
+        {
+            responseTask.ContinueWith((responseAction) =>
+            {
+                var response = responseAction.Result;
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    tcs.SetResult(default(T));
+                }
+                response.Content.ReadAsStringAsync()
+                    .ContinueWith((content) =>
+                    {
+                        try
+                        {
+                            tcs.SetResult(JsonConvert.DeserializeObject<T>(content.Result));
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
+
+                    });
+            });
+        }
+
+        private static void DisposeHttpClient<T>(TaskCompletionSource<T> tcs, HttpClient client)
+        {
+            if (tcs.Task.IsCompleted)
+            {
+                client.Dispose();
+            }
         }
         #endregion
     }
