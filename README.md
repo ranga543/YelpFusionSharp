@@ -1,5 +1,5 @@
-# YelpSharperClient
-YelpSharperClient is a .NET wrapper for the Yelp REST API. The library is written in C#.
+# YelpSharper
+YelpSharper is a .NET wrapper for the Yelp REST API. The library is written in C#.
 # Code Example
 ```C#
 //Create client instance
