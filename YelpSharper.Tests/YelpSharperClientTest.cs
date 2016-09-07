@@ -33,7 +33,7 @@ namespace YelpSharper.Tests
         [TestMethod]
         public void SearchBusinessesByPhoneShouldReturn()
         {
-            var response =_yelpSharperClient.SearchByPhone(new {phone = "+18014384823"});
+            var response =_yelpSharperClient.SearchByPhone(new {phone = "+18015420124"});
             Assert.IsNotNull(response.Businesses);
         }
 
