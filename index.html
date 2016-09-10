@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Yelpsharper by ranga543</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Yelpsharper</h1>
+      <h2 class="project-tagline">YelpSharper is a .NET wrapper for the Yelp REST API v3 devloper preview. The library is written in C#.</h2>
+      <a href="https://github.com/ranga543/YelpSharper" class="btn">View on GitHub</a>
+      <a href="https://github.com/ranga543/YelpSharper/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ranga543/YelpSharper/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="yelpsharper" class="anchor" href="#yelpsharper" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YelpSharper</h1>
+
+<p>YelpSharper is a .NET wrapper for the Yelp REST API v3 developer preview. The library is written in C#.</p>
+
+<p>For more information, visit the <a href="https://www.yelp.com/developers/v3/preview">Yelp REST API</a></p>
+
+<h2>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h2>
+
+<p>In most cases, you're going to want to install the YelpSharp NuGet package.  Open up the Package Manager Console in Visual Studio, and run this command:</p>
+
+<pre><code>PM&gt; Install-Package YelpSharper
+</code></pre>
+
+<h1>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to Use</h1>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-c">//Create client instance</span>
+<span class="pl-k">var</span> yelpSharperClient = <span class="pl-k">new</span> YelpSharperClient();
+
+<span class="pl-c">//Get accesstoken using app client id &amp; client secret</span>
+<span class="pl-k">var</span> tokenResponse = yelpSharperClient.GetToken(<span class="pl-s"><span class="pl-pds">"</span>Your client id here<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Your client secret here<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">//Assign token to make further API calls to Yelp</span>
+yelpSharperClient.AccessToken = tokenResponse.AccessToken;
+
+<span class="pl-c">//Search</span>
+<span class="pl-k">var</span> searchResponse = yelpSharperClient.Search(<span class="pl-k">new</span> {term = <span class="pl-s"><span class="pl-pds">"</span>indian food<span class="pl-pds">"</span></span>, latitude = <span class="pl-s"><span class="pl-pds">"</span>40.581140<span class="pl-pds">"</span></span>, longitude = <span class="pl-s"><span class="pl-pds">"</span>-111.914184<span class="pl-pds">"</span></span>});
+
+<span class="pl-c">//Search by phone</span>
+<span class="pl-k">var</span> searchByPhoneResponse = yelpSharperClient.SearchByPhone(<span class="pl-k">new</span> {phone = <span class="pl-s"><span class="pl-pds">"</span>+18014384823<span class="pl-pds">"</span></span>});
+
+<span class="pl-c">//Get business by id</span>
+<span class="pl-k">var</span> businessResponse = yelpSharperClient.GetBusiness(<span class="pl-s"><span class="pl-pds">"</span>india-palace-south-jordan-2<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">//Get business reviews</span>
+<span class="pl-k">var</span> reviewsResponse = yelpSharperClient.GetBusinessReviews(<span class="pl-s"><span class="pl-pds">"</span>india-palace-south-jordan-2<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">//Search by transaction type</span>
+<span class="pl-k">var</span> searchTransactionResponse = yelpSharperClient.SearchByTransaction(<span class="pl-s"><span class="pl-pds">"</span>delivery<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> { latitude = <span class="pl-s"><span class="pl-pds">"</span>40.581140<span class="pl-pds">"</span></span>, longitude = <span class="pl-s"><span class="pl-pds">"</span>-111.914184<span class="pl-pds">"</span></span> });
+
+<span class="pl-c">//Autocomplete</span>
+<span class="pl-k">var</span> autocompleteResponse = yelpSharperClient.Autocomplete(<span class="pl-k">new</span> { text = <span class="pl-s"><span class="pl-pds">"</span>india<span class="pl-pds">"</span></span>, latitude = <span class="pl-s"><span class="pl-pds">"</span>40.581140<span class="pl-pds">"</span></span>, longitude = <span class="pl-s"><span class="pl-pds">"</span>-111.914184<span class="pl-pds">"</span></span> });</pre></div>
+
+<h2>
+<a id="building-the-source" class="anchor" href="#building-the-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building the Source</h2>
+
+<p>If you want to build the source, clone the repository, and open up YelpSharp.sln.  </p>
+
+<pre><code>git clone https://github.com/ranga543/YelpSharper.git
+explorer YelpSharper\YelpSharper.sln
+</code></pre>
+
+<h2>
+<a id="supported-platforms" class="anchor" href="#supported-platforms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported Platforms</h2>
+
+<p>YelpSharp targets .NET &gt;=4.0.  If you would like support for other platforms, let me know.  </p>
+
+<h2>
+<a id="questions" class="anchor" href="#questions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Questions?</h2>
+
+<p>Feel free to submit an issue on the repository.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ranga543/YelpSharper">Yelpsharper</a> is maintained by <a href="https://github.com/ranga543">ranga543</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
