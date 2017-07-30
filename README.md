@@ -1,4 +1,4 @@
-# YelpSharper
+# YelpFusion.Client
 YelpSharper is a .NET wrapper for the Yelp REST API v3 developer preview. The library is written in C#.
 
 For more information, visit the [Yelp REST API](https://www.yelp.com/developers/v3/preview)
@@ -7,44 +7,44 @@ For more information, visit the [Yelp REST API](https://www.yelp.com/developers/
 In most cases, you're going to want to install the YelpSharp NuGet package.  Open up the Package Manager Console in Visual Studio, and run this command:
 
 ```
-PM> Install-Package YelpSharper
+PM> Install-Package YelpFusion.Client -Version 1.0.2
 ```
 
 # How to Use
 ```C#
 //Create client instance
-var yelpSharperClient = new YelpSharperClient();
+var yelpFusionClient = new YelpFusionClient();
 
 //Get accesstoken using app client id & client secret
-var tokenResponse = yelpSharperClient.GetToken("Your client id here", "Your client secret here");
+var tokenResponse = yelpFusionClient.GetToken("Your client id here", "Your client secret here");
 
 //Assign token to make further API calls to Yelp
-yelpSharperClient.AccessToken = tokenResponse.AccessToken;
+yelpFusionClient.AccessToken = tokenResponse.AccessToken;
 
 //Search
-var searchResponse = yelpSharperClient.Search(new {term = "indian food", latitude = "40.581140", longitude = "-111.914184"});
+var searchResponse = yelpFusionClient.Search(new BusinessSearchOptions{Term = "indian food", Latitude = 40.581140M, Longitude = -111.914184M});
 
 //Search by phone
-var searchByPhoneResponse = yelpSharperClient.SearchByPhone(new {phone = "+18014384823"});
+var searchByPhoneResponse = yelpFusionClient.SearchByPhone("+18014384823");
 
 //Get business by id
-var businessResponse = yelpSharperClient.GetBusiness("india-palace-south-jordan-2");
+var businessResponse = yelpFusionClient.GetBusiness("india-palace-south-jordan-2");
 
 //Get business reviews
-var reviewsResponse = yelpSharperClient.GetBusinessReviews("india-palace-south-jordan-2");
+var reviewsResponse = yelpFusionClient.GetBusinessReviews("india-palace-south-jordan-2");
 
 //Search by transaction type
-var searchTransactionResponse = yelpSharperClient.SearchByTransaction("delivery", new { latitude = "40.581140", longitude = "-111.914184" });
+var searchTransactionResponse = yelpFusionClient.SearchByTransaction("delivery", new TransactionSearchOptions { Latitude = 40.581140M, Longitude = -111.914184M });
 
 //Autocomplete
-var autocompleteResponse = yelpSharperClient.Autocomplete(new { text = "india", latitude = "40.581140", longitude = "-111.914184" });
+var autocompleteResponse = yelpFusionClient.Autocomplete(new AutoCompleteOptions { Text = "india", Latitude = 40.581140M, Longitude = -111.914184M });
 ```
 ## Building the Source
 If you want to build the source, clone the repository, and open up YelpSharp.sln.  
 
 ```
-git clone https://github.com/ranga543/YelpSharper.git
-explorer YelpSharper\YelpSharper.sln
+git clone https://github.com/ranga543/YelpFusionSharp.git
+explorer YelpFusionSharp\YelpFusionSharp.sln
 ```
 
 ## Supported Platforms
